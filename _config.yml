@@ -17,6 +17,8 @@ minimal: false             # use a dark header
 
 navigation:                # accepts {file, title, url, icon, sidebaricon}
   - {file: "Resume_Ruilin Zhou.pdf", title: "resume", icon: home}
+  - {title: "LinkedIn", url: "www.linkedin.com/in/ruilin-zhou-6351a51b4"}
+
 
 external:                  # shows a footer with social links - for available icons see fontawesome.com/icons
   - {title: Mail, icon: envelope, url: "mailto:rlzhou@uw.edu"}
