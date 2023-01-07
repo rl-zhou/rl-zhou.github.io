@@ -16,7 +16,7 @@ minimal: false             # use a dark header
 # Menu
 
 navigation:                # accepts {file, title, url, icon, sidebaricon}
-  - {file: "Resume_Ruilin Zhou.pdf", title: "resume", icon: letter}
+  - {title: "resume", file: "Resume_Ruilin Zhou.pdf"}
   - {title: "LinkedIn", url: "www.linkedin.com/in/ruilin-zhou-6351a51b4"}
   - {title: "Projects", file: "index.html"}
 
