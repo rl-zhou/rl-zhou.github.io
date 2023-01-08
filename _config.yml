@@ -16,9 +16,9 @@ minimal: false             # use a dark header
 # Menu
 
 navigation:                # accepts {file, title, url, icon, sidebaricon}
-  - {title: "resume", file: "Resume_Ruilin Zhou.pdf"}
+  - {file: "Resume_Ruilin Zhou.pdf", title: "resume"}
   - {title: "LinkedIn", url: "www.linkedin.com/in/ruilin-zhou-6351a51b4"}
-  - {title: "Projects", file: "projects.md"}
+  - {file: "projects.md", title: "Projects"}
 
 
 external:                  # shows a footer with social links - for available icons see fontawesome.com/icons
