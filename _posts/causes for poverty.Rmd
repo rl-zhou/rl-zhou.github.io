@@ -1,5 +1,9 @@
 ---
 title: "ML model for potential causes of poverty"
+mathjax: true
+layout: post
+output: html_document
+categories: project
 ---
 
 ```{r , echo=FALSE, warning = FALSE}
