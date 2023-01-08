@@ -6,7 +6,7 @@ output: html_document
 categories: project
 ---
 
-```{r setup, include=FALSE}
+```{r}
 knitr::opts_chunk$set(echo = TRUE)
 library(DESeq2)
 library(ggplot2)
@@ -14,15 +14,6 @@ library(tidyverse)
 library(apeglm)
 library(gplots)
 library(pheatmap)
-
-#if (!requireNamespace("BiocManager", quietly = TRUE))
-    #install.packages("BiocManager")
-#BiocManager::install("apeglm")
-
-#    if (!require("BiocManager", quietly = TRUE))
-    #install.packages("BiocManager")
-
-#BiocManager::install("ComplexHeatmap")
 ```
 
 
