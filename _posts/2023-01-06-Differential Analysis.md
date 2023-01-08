@@ -6,7 +6,7 @@ output: html_document
 categories: project
 ---
 
-```r
+{% highlight r %}
 knitr::opts_chunk$set(echo = TRUE)
 library(DESeq2)
 library(ggplot2)
@@ -14,12 +14,12 @@ library(tidyverse)
 library(apeglm)
 library(gplots)
 library(pheatmap)
-```
+{% endhighlight %}
 
 
 # Gene Quantification
 Data loading
-```r
+{% highlight r %}
 # load data
 rawCount <- read.delim("adar.rawcount.txt")
 row.names(rawCount) <- rawCount[,1]
@@ -28,10 +28,10 @@ rawCount = rawCount[,-1]
 # creating a meta table
 name <- names(rawCount)
 metaTable <- data.frame(row.names = name[1:length(name)], condition = as.factor(c(rep('adarsg1_ifnb', 3), rep('adarsg1_ns', 3), rep('ctrl_ifnb', 3), rep('ctrl_ns', 3))))
-```
+{% endhighlight %}
 
 Count Normalization
-```r
+{% highlight r %}
 # DDS, Transforms count to log2FoldChange
 dds <- DESeqDataSetFromMatrix(countData = rawCount, colData = metaTable, design = ~ condition)
 keep <- rowSums(counts(dds)) >=10 ### keep genes that have at least 10 reads across all samples
@@ -41,11 +41,11 @@ dds <- DESeq(dds) # the main DESeq function, including count  normalization
 # extract the normalized counts
 normCounts <- counts(dds, normalized=T)
 write.csv(normCounts, 'normalizedCounts.csv')
-```
+{% endhighlight %}
 
 Differential Gene Expression Analysis 
 Creating Contrasts for comparisons
-```r
+{% highlight r %}
 # set the factor level
 #dds$condition <- relevel(dds$condition, ref = 'ctrl') ###
 
@@ -55,10 +55,10 @@ adarsg1_ifnb_VS_ctrl_ns <- c('condition', 'adarsg1_ifnb', 'ctrl_ns')
 adarsg1_ns_VS_ctrl_ifnb <- c('condition', 'adarsg1_ns', 'ctrl_ifnb')
 adarsg1_ns_VS_ctrl_ns <- c('condition', 'adarsg1_ns', 'ctrl_ns')
 ctrl_ifnb_VS_ctrl_ns <- c('condition', 'ctrl_ifnb', 'ctrl_ns')
-```
+{% endhighlight %}
 
 The actual analysis data
-```r
+{% highlight r %}
 ## unshrunken differential gene expression analysis results, alpha=0.05
 ### base mean, log2 fold change, p-value
 res_adarsg1_ifnb_VS_adarsg1_ns <- results(dds, alpha=0.05, contrast=adarsg1_ifnb_VS_adarsg1_ns) 
@@ -67,29 +67,29 @@ res_adarsg1_ifnb_VS_ctrl_ns <- results(dds, alpha=0.05, contrast=adarsg1_ifnb_VS
 res_adarsg1_ns_VS_ctrl_ifnb <- results(dds, alpha=0.05, contrast=adarsg1_ns_VS_ctrl_ifnb) 
 res_adarsg1_ns_VS_ctrl_ns <- results(dds, alpha=0.05, contrast=adarsg1_ns_VS_ctrl_ns) 
 res_ctrl_ifnb_VS_ctrl_ns <- results(dds, alpha=0.05, contrast=ctrl_ifnb_VS_ctrl_ns) 
-```
+{% endhighlight %}
 
 ## PCA
-```r
+{% highlight r %}
 plotPCA(rlog(dds))
-```
+{% endhighlight %}
 
 
 
 # Visualization 
 ## MA Plots
-```r
+{% highlight r %}
 #plotMA(res_adarsg1_ifnb_VS_adarsg1_ns)
 plotMA(res_adarsg1_ifnb_VS_ctrl_ifnb)
 #plotMA(res_adarsg1_ifnb_VS_ctrl_ns)
 #plotMA(res_adarsg1_ns_VS_ctrl_ifnb)
 #plotMA(res_adarsg1_ns_VS_ctrl_ns)
 #plotMA(res_ctrl_ifnb_VS_ctrl_ns)
-```
+{% endhighlight %}
 blue dots: significant
 
 ## Heatmap
-```r
+{% highlight r %}
 # step1: extract the log2fold change and padj columns
 heatmap_values <- res_adarsg1_ifnb_VS_ctrl_ifnb[, c(2,6)]
 
@@ -101,7 +101,7 @@ head(topGenes[order(topGenes$log2FoldChange, decreasing = T),])
 topGenes.df <- as.data.frame(topGenes$log2FoldChange)
 topGenes.df$genes <- rownames(normCounts)
 
-```
+{% endhighlight %}
 
 
 
