@@ -76,8 +76,6 @@ plotPCA(rlog(dds))
 
 
 
-
-
 # Visualization 
 ## MA Plots
 ```{r}
@@ -91,11 +89,6 @@ plotMA(res_adarsg1_ifnb_VS_ctrl_ifnb)
 blue dots: significant
 
 ## Heatmap
-y axis: log2fold change, avg expression, gene id
-x axis: sample
-- steps
-  1. log2fold change and padj for res_adarsg1_ifnb_VS_ctrl_ifnb
-  2. get the most differently expressed genes (negative log2 fold change?)
 ```{r}
 # step1: extract the log2fold change and padj columns
 heatmap_values <- res_adarsg1_ifnb_VS_ctrl_ifnb[, c(2,6)]
@@ -107,7 +100,6 @@ head(topGenes[order(topGenes$log2FoldChange, decreasing = T),])
 
 topGenes.df <- as.data.frame(topGenes$log2FoldChange)
 topGenes.df$genes <- rownames(normCounts)
-
 
 ```
 
