@@ -6,7 +6,7 @@ output: html_document
 categories: project
 ---
 
-```{r , echo=FALSE, warning = FALSE}
+{% highlight r %}
 library(tidyverse)
 library(fs)
 library(dbplyr)
@@ -21,11 +21,11 @@ library(class)
 library(FNN)
 library(purrr)
 library(maptree)
-```
+library(glmnet)
+{% endhighlight %}
 
 
-```{r census setup, echo=FALSE, warning = FALSE}
-
+{% highlight r %}
 state.name <- c(state.name, "District of Columbia")
 state.abb <- c(state.abb, "DC")
 
@@ -36,11 +36,10 @@ census <- read_csv("acs2017_county_data.csv") %>%
   select(-CountyId, -ChildPoverty, -Income, -IncomeErr, -IncomePerCap, -IncomePerCapErr) %>%
    mutate(State = state.abb[match(`State`, state.name)]) %>%
    filter(State != "PR")
+{% endhighlight %}
 
 
-```
-
-```{r education setup, echo=FALSE, warning = FALSE}
+{% highlight r %}
 # read in education data
 ## change of variables & variable names to match with the census dataset
 education <- read_csv("Education.csv") %>%
@@ -52,24 +51,25 @@ education <- read_csv("Education.csv") %>%
           -`2013 Rural-urban Continuum Code`,
           -`2013 Urban Influence Code`) %>%
    rename(County = `Area name`)
-```
+{% endhighlight %}
+
 
 # Preliminary Data Analysis
 ### census data
-```{r, echo=FALSE, warning = FALSE}
 
+{% highlight r %}
 # check that all states are included (should == 51)
 length(unique(census$State)) 
 
 # check for missing values
 ## == 0
 sum(is.na(census))
-```
+{% endhighlight %}
 
 
 ### education data
-```{r, echo=FALSE, warning = FALSE}
 
+{% highlight r %}
 # check for missing values
 sum(is.na(education))
 sum(rowSums(is.na(education))!=0)
@@ -77,13 +77,12 @@ sum(rowSums(is.na(education))!=0)
 # compare the number of distinct counties in two datasets
 length(unique(education$County))
 length(unique(census$County))
-
-```
+{% endhighlight %}
 
 
 # Data Wrangling
-```{r, echo=FALSE, warning = FALSE}
 
+{% highlight r %}
 # exclude missing values, and only include State, County, and the four variables for year 2015-19
 edu <- education[complete.cases(education),] %>% 
   select("State","County", "Less than a high school diploma, 2015-19", 
@@ -109,13 +108,12 @@ education.state <- edu %>%
 # add a new variable (majority) that records the education level with the largest population in each state
 state.level <- education.state %>% 
   mutate(majority = colnames(education.state)[max.col(education.state[,2:5])+1])
-
-```
+{% endhighlight %}
 
 
 # Visualization
-```{r 7}
 
+{% highlight r %}
 states <- map_data("state")
 
 # merge state.level and states
@@ -135,11 +133,12 @@ ggplot(data = state.merged) +
        title = "Education Level For the Majority in Each State",
        fill = "Education Level") + 
   scale_fill_discrete(labels=c("Associate's", "Bachelor's or Higher", "High School"))
-```
+{% endhighlight %}
+
 
 ### visualization of census data
-```{r}
 
+{% highlight r %}
 # merge census with states
 ## census.state has aggregated population by states
 census.state <- census %>% 
@@ -182,11 +181,11 @@ odds <- function(x) seq_along(x) %% 2 > 0
 
 
 heatmap(census$Poverty)
-```
+{% endhighlight %}
 
 
 
-```{r 8 , echo=FALSE, warning = FALSE}
+{% highlight r %}
 for (i in state.abb){
   a <- census %>%
     filter(State == i)
@@ -197,11 +196,12 @@ for (i in state.abb){
     ggtitle("State:", i)
   print(b)
 }
-```
+{% endhighlight %}
 
 
 ### clean and aggregate census
-```{r 9 , echo=FALSE, warning = FALSE}
+
+{% highlight r %}
 #excluded NA values
 # converted {Men, Employed, VotingAgeCitizen} attributes to percentages
 # combined {Hispanic, Black, Native, Asian, Pacific} to {Minority}
@@ -215,11 +215,11 @@ census.clean <- census[rowSums(is.na(census))==0,] %>%
 # check for collinearity: SelfEmployed and WorkAtHome are correlated ()
 # mm <- cor(census.clean[,3:ncol(census.clean)])
 # which(mm > 0.6, arr.ind = TRUE)
+{% endhighlight %}
 
-```
 
 # Dimensionality reudction: PCA
-```{r 11 , echo=FALSE, warning = FALSE}
+{% highlight r %}
 pca_census <- prcomp(select(census.clean, -c("State", "County")), scale. = TRUE)
 
 # store PC1 and PC2
@@ -233,12 +233,11 @@ pc.rotation <- pc.rotation %>%
   mutate(PC1.abs = abs(PC1), PC2.abs = abs(PC2)) %>% 
   arrange(desc(PC1.abs))
 head(pc.rotation, 3)
-
-```
+{% endhighlight %}
 
   
 
-```{r 12 , echo=FALSE, warning = FALSE}
+{% highlight r %}
 prvar <- pca_census$sdev^2
 pve <- prvar/(sum(prvar))
 
@@ -251,12 +250,11 @@ plot(cumsum(pve), xlab="Principal Component ",
 
 numofPC <-which(cumsum(pve) >= 0.9)[1]
 cat("According to the Cumulative Proportion of Variance explained,", numofPC, "PC is needed to capture 90% of the variance for analysis. ")
+{% endhighlight %}
 
-
-```
 
 # Clusturing
-```{r 13 , echo=FALSE, warning = FALSE}
+{% highlight r %}
 census.dist <- dist(census.clean)
 set.seed(1)
 census.hclust <- hclust(census.dist, method = "complete")
@@ -280,9 +278,10 @@ dendro2 <- as.dendrogram(pc.hclust) %>%
   set_labels(dendo2, labels = pc.hclust$labels[order.dendrogram(.)])
   
 plot(dendro2, horiz = T, main = "Clustering using PC1 and PC2")
-```
+{% endhighlight %}
 
-```{r , echo=FALSE, warning = FALSE}
+
+{% highlight r %}
 clus = cutree(census.hclust, k=10)
 table(clus)
 clus2 = cutree(pc.hclust, k=10)
@@ -295,19 +294,19 @@ clus[228]
 
 clus1withSB <-census.clean[which(clus == clus[228]), ]
 clus2withSB <-census.clean[which(clus2 == clus2[228]),]
-
-```
+{% endhighlight %}
 
  
 
-```{r , echo=FALSE, warning = FALSE}
+{% highlight r %}
 all <- census.clean %>%
    left_join(edu, by = c("State"="State", "County"="County")) %>%
    na.omit
-```
+{% endhighlight %}
+
 
 # Modeling
-```{r, 14 v1 , echo=FALSE, warning = FALSE}
+{% highlight r %}
 all$Poverty[all$Poverty <= 20] <-0
 all$Poverty[!all$Poverty <=20] <-1
 
@@ -319,34 +318,33 @@ all.te <- all[-idx.tr, ]
 
 # all <- all %>%
 #   select(-c("TotalPop", "VotingAgeCitizen", "WorkAtHome", "MeanCommute", "Drive", "Transit", "Carpool","OtherTransp", "PrivateWork", "FamilyWork"))
+{% endhighlight %}
 
-```
 
+{% highlight r %}
+set.seed(123)
+nfold <- 10
+folds <- sample(cut(1:nrow(all.tr), breaks=nfold, labels=FALSE))
 
-```{r , echo=FALSE, warning = FALSE}
- 
- set.seed(123)
- nfold <- 10
- folds <- sample(cut(1:nrow(all.tr), breaks=nfold, labels=FALSE))
- 
- calc_error_rate = function(predicted.value, true.value){ 
-   return(mean(true.value!=predicted.value))
- }
+calc_error_rate = function(predicted.value, true.value){ 
+ return(mean(true.value!=predicted.value))
+}
 records = matrix(NA, nrow=3, ncol=2)
 colnames(records) = c("train.error","test.error")
 rownames(records) = c("tree","logistic","lasso")
 colnames(all.tr)
-```
+{% endhighlight %}
 
 
-```{r 14 v2 , echo=FALSE, warning = FALSE}
+{% highlight r %}
 colnames(all.tr)[22:25] <- c("LessThanHighSchool", "HighSchool", "Associate", "BachelorHigher")
 colnames(all.te)[22:25] <- c("LessThanHighSchool", "HighSchool", "Associate", "BachelorHigher")
-```
+{% endhighlight %}
+
 
 # Classification
 ### Tree
-```{r 15 , echo=FALSE, warning = FALSE}
+{% highlight r %}
 tree.unpruned = tree(Poverty ~ State + County + TotalPop + Men + Minority + Employed + LessThanHighSchool + HighSchool + Associate + BachelorHigher, data = all.tr)
 
 
@@ -391,13 +389,13 @@ records[1,1] = 1-sum(diag(pruned.tr.err))/sum(pruned.tr.err)
 pruned.te.err = table(pruned.te.pred, all.te$Poverty)
 records[1,2] = 1-sum(diag(pruned.te.err))/sum(pruned.te.err)
 records
-
-```
+{% endhighlight %}
    
 
 
 ### Logistic
-```{r 16 , echo=FALSE, warning = FALSE}
+
+{% highlight r %}
 # model
 glm.fit = glm(Poverty~., data = all.tr, family=binomial)
 summary(glm.fit)
@@ -412,14 +410,12 @@ logistic.pred.te=as.factor(ifelse(prob.te >0.5, 1, 0))
 glm.te.table = table(pred=logistic.pred.te, true=all.te$Poverty) # test error table
 records[2,1] = 1-sum(diag(glm.tr.table)/sum(glm.tr.table))
 records[2,2] = 1-sum(diag(glm.te.table)/sum(glm.te.table))
-
-
-```
+{% endhighlight %}
 
 
 ### Lasso
-```{r 17 2nd , echo=FALSE, warning = FALSE}
-library(glmnet)
+
+{% highlight r %}
 set.seed(123)
 x = model.matrix(Poverty~., all.tr)[,-1]
 x.test = model.matrix(Poverty~., all.te)[,-1]
@@ -451,16 +447,17 @@ abline(v = log(cv.out.lasso$lambda.min), col="red", lwd=3, lty=2)
 
 records[3,1] = 1-sum(diag(latrain)/sum(latrain))
 records[3,2] = 1-sum(diag(latest)/sum(latest))
-```
+{% endhighlight %}
 
 
-```{r}
+{% highlight r %}
 records
-```
+{% endhighlight %}
 
 
 ### ROC 
-```{r 18 , echo=FALSE, warning = FALSE}
+
+{% highlight r %}
 # tree
 library(ROCR)
 tr.pred <-predict(tree.pruned, newdata = all.te)
@@ -480,12 +477,12 @@ plot(perf.tree, lwd = 0.6, col = 2)
 plot(perf.logistic,  lwd = 0.6, add = TRUE, col =3)
 plot(perf.lasso,  lwd = 0.6,  add = TRUE,col = 4)
 legend(0.6,0.6, c("Decision Tree", "Logistic Classification", "Lasso classification"), 2:4)
-```
+{% endhighlight %}
 
 
 
 ### KNN
-```{r 19KNN , echo=FALSE, warning = FALSE}
+{% highlight r %}
 
 YTrain = all.tr$Poverty
 
@@ -514,10 +511,10 @@ conf.test = table(predicted=pred.TestY, true = YTest)
 TesterrorKNN <-1-sum(diag(conf.test)/sum(conf.test))
 TesterrorKNN
 cat("The trainning error rate for KNN is ", TrainerrorKNN, ", and the test error rate is ", TesterrorKNN, ".")
-```
+{% endhighlight %}
 
 ### Random Forest
-```{r 19randomForest , echo=FALSE, warning = FALSE}
+{% highlight r %}
 set.seed(123)
 # Installing package
 # install.packages("caTools")       # For sampling the dataset
@@ -546,12 +543,11 @@ conf.testRF
 cat("The trainning error rate for randomforest is ", conf.trainRF, " and the test error rate is ", conf.testRF, ".")
 varImpPlot(RFmodel, sort=T, main="Variable Importance for RF-poverty vs others", n.var=5)
 # list out the 5 most important variables recognized by the RF through constructing 500 trees
-
-```
+{% endhighlight %}
 
  
 
-```{r 20 , echo=FALSE, warning = FALSE}
+{% highlight r %}
 Poverty.num <- census %>%
    left_join(edu, by = c("State"="State", "County"="County")) %>%
   na.omit
@@ -586,12 +582,11 @@ te.err.rate <- 1-sum(diag(lm.te.err.table)/sum(lm.te.err.table))
 
 tr.err.rate
 te.err.rate
-
-```
-
+{% endhighlight %}
 
 
-```{r 21 , echo=FALSE, warning = FALSE}
+
+{% highlight r %}
 summary(lm.mod)
 plot(lm.mod$residuals ~ lm.mod$fitted.values, xlab = "Fitted", ylab = "Residual")
 title('Residual vs. fitted plot')
@@ -624,7 +619,7 @@ plot(perf.lasso,  lwd = 0.6,  add = TRUE,col = 4)
 plot(perf.lm, lwd = 0.6, add = TRUE, col =5)
 
 legend(0.6,0.6, c("Decision Tree", "Logistic Classification", "Lasso classification", "Linear Regression->classification"), 2:5)
-```
+{% endhighlight %}
 
 
 
