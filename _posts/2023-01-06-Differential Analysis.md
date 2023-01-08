@@ -6,7 +6,7 @@ output: html_document
 categories: project
 ---
 
-```{r}
+```r
 knitr::opts_chunk$set(echo = TRUE)
 library(DESeq2)
 library(ggplot2)
@@ -19,7 +19,7 @@ library(pheatmap)
 
 # Gene Quantification
 Data loading
-```{r}
+```r
 # load data
 rawCount <- read.delim("adar.rawcount.txt")
 row.names(rawCount) <- rawCount[,1]
@@ -31,7 +31,7 @@ metaTable <- data.frame(row.names = name[1:length(name)], condition = as.factor(
 ```
 
 Count Normalization
-```{r}
+```r
 # DDS, Transforms count to log2FoldChange
 dds <- DESeqDataSetFromMatrix(countData = rawCount, colData = metaTable, design = ~ condition)
 keep <- rowSums(counts(dds)) >=10 ### keep genes that have at least 10 reads across all samples
@@ -45,7 +45,7 @@ write.csv(normCounts, 'normalizedCounts.csv')
 
 Differential Gene Expression Analysis 
 Creating Contrasts for comparisons
-```{r}
+```r
 # set the factor level
 #dds$condition <- relevel(dds$condition, ref = 'ctrl') ###
 
@@ -58,7 +58,7 @@ ctrl_ifnb_VS_ctrl_ns <- c('condition', 'ctrl_ifnb', 'ctrl_ns')
 ```
 
 The actual analysis data
-```{r}
+```r
 ## unshrunken differential gene expression analysis results, alpha=0.05
 ### base mean, log2 fold change, p-value
 res_adarsg1_ifnb_VS_adarsg1_ns <- results(dds, alpha=0.05, contrast=adarsg1_ifnb_VS_adarsg1_ns) 
@@ -70,7 +70,7 @@ res_ctrl_ifnb_VS_ctrl_ns <- results(dds, alpha=0.05, contrast=ctrl_ifnb_VS_ctrl_
 ```
 
 ## PCA
-```{r}
+```r
 plotPCA(rlog(dds))
 ```
 
@@ -78,7 +78,7 @@ plotPCA(rlog(dds))
 
 # Visualization 
 ## MA Plots
-```{r}
+```r
 #plotMA(res_adarsg1_ifnb_VS_adarsg1_ns)
 plotMA(res_adarsg1_ifnb_VS_ctrl_ifnb)
 #plotMA(res_adarsg1_ifnb_VS_ctrl_ns)
@@ -89,7 +89,7 @@ plotMA(res_adarsg1_ifnb_VS_ctrl_ifnb)
 blue dots: significant
 
 ## Heatmap
-```{r}
+```r
 # step1: extract the log2fold change and padj columns
 heatmap_values <- res_adarsg1_ifnb_VS_ctrl_ifnb[, c(2,6)]
 
