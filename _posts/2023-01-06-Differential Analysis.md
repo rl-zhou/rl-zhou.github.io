@@ -6,6 +6,7 @@ output: html_document
 categories: project
 ---
 
+
 {% highlight r %}
 knitr::opts_chunk$set(echo = TRUE)
 library(DESeq2)
@@ -21,7 +22,7 @@ library(pheatmap)
 Data loading
 {% highlight r %}
 # load data
-rawCount <- read.delim("adar.rawcount.txt")
+rawCount <- read.delim("GSE110708_adar.rawcount.txt")
 row.names(rawCount) <- rawCount[,1]
 rawCount = rawCount[,-1]
 
@@ -79,14 +80,9 @@ plotPCA(rlog(dds))
 # Visualization 
 ## MA Plots
 {% highlight r %}
-#plotMA(res_adarsg1_ifnb_VS_adarsg1_ns)
 plotMA(res_adarsg1_ifnb_VS_ctrl_ifnb)
-#plotMA(res_adarsg1_ifnb_VS_ctrl_ns)
-#plotMA(res_adarsg1_ns_VS_ctrl_ifnb)
-#plotMA(res_adarsg1_ns_VS_ctrl_ns)
-#plotMA(res_ctrl_ifnb_VS_ctrl_ns)
 {% endhighlight %}
-blue dots: significant
+blue dots: differently expressed genes
 
 ## Heatmap
 {% highlight r %}
@@ -99,13 +95,14 @@ head(topGenes[order(topGenes$log2FoldChange),], 100)
 head(topGenes[order(topGenes$log2FoldChange, decreasing = T),])
 
 topGenes.df <- as.data.frame(topGenes$log2FoldChange)
-topGenes.df$genes <- rownames(normCounts)
 
 {% endhighlight %}
 
 
 
 # References
-1. Youtube:
-2. Evans, Ciaran et al. “Selecting between-sample RNA-Seq normalization methods from the perspective of their assumptions.” Briefings in bioinformatics vol. 19,5 (2018): 776-792. doi:10.1093/bib/bbx008
+1. The raw count file is retrieved from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE110708
+2. Youtube: https://www.youtube.com/watch?v=OzNzO8qwwp0
+3. Evans, Ciaran et al. “Selecting between-sample RNA-Seq normalization methods from the perspective of their assumptions.” Briefings in bioinformatics vol. 19,5 (2018): 776-792. doi:10.1093/bib/bbx008
+4. http://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#standard-workflow
 
