@@ -15,7 +15,7 @@ library(knitr)
 library(vtable)
 {% endhighlight %}
 
-### setup
+# setup
 {% highlight r %}
 # read in table
 birth_copy <- read.table("BirthsKingCounty2001-Biost514-517-2022.txt", header=T)
