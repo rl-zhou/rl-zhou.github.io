@@ -1,8 +1,9 @@
 ---
-title: "Applied Project"
-author: "Raylynn Zhou"
-date: "11/17/2022"
+title:  "Differential Expression Analysis"
+mathjax: true
+layout: pdf
 output: html_document
+categories: project
 ---
 
 ```{r setup, include=FALSE}
