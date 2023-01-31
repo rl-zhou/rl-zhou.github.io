@@ -253,21 +253,30 @@ cat("According to the Cumulative Proportion of Variance explained,", numofPC, "P
 {% endhighlight %}
 
 
-# Clusturing
+# Hierarchical Clusturing
 {% highlight r %}
+# calculate the distance matrix that will be the first input of hclust()
 census.dist <- dist(census.clean)
+
+# complete linkage clustering
 set.seed(1)
 census.hclust <- hclust(census.dist, method = "complete")
 
+# plot() is too messy
+# plot(census.hclust)
+
+# 10 cluster dendogram
+## use as.dendrogram when the observation number is large
 dendro1 <- as.dendrogram(census.hclust) %>%
   color_branches(., k = 10) %>%
   color_labels(., k = 10) %>%
   set(., "labels_cex", 0.5) %>% 
   set_labels(., labels = census.hclust$labels[order.dendrogram(.)])
-  
 
 plot(dendro1, horiz = T, main = "Clustering Using Census.Clean")
 
+
+# simplify the tree by only considering the two largest PCs
 pc.county.dist <-dist(pc.county)
 set.seed(1)
 pc.hclust <- hclust(pc.county.dist, method = "complete")
@@ -278,12 +287,16 @@ dendro2 <- as.dendrogram(pc.hclust) %>%
   set_labels(dendo2, labels = pc.hclust$labels[order.dendrogram(.)])
   
 plot(dendro2, horiz = T, main = "Clustering using PC1 and PC2")
-{% endhighlight %}
 
 
-{% highlight r %}
+
+# cutree() gives the cluster assignments to each observations
+
+# cluster assignment for the complicated tree
 clus = cutree(census.hclust, k=10)
 table(clus)
+
+# cluster assignment for the simplified tree (for 2 PC's)
 clus2 = cutree(pc.hclust, k=10)
 table(clus2)
 which(census.clean$County == "Santa Barbara County")
@@ -299,6 +312,7 @@ clus2withSB <-census.clean[which(clus2 == clus2[228]),]
  
 
 {% highlight r %}
+# combine the cleaned census data and education
 all <- census.clean %>%
    left_join(edu, by = c("State"="State", "County"="County")) %>%
    na.omit
@@ -307,6 +321,7 @@ all <- census.clean %>%
 
 # Modeling
 {% highlight r %}
+# setup
 all$Poverty[all$Poverty <= 20] <-0
 all$Poverty[!all$Poverty <=20] <-1
 
@@ -322,21 +337,26 @@ all.te <- all[-idx.tr, ]
 
 
 {% highlight r %}
+# determines which fold we are selecting each time
 set.seed(123)
 nfold <- 10
 folds <- sample(cut(1:nrow(all.tr), breaks=nfold, labels=FALSE))
+ 
+ calc_error_rate = function(predicted.value, true.value){ 
+   return(mean(true.value!=predicted.value))
+ }
+{% endhighlight %}
 
-calc_error_rate = function(predicted.value, true.value){ 
- return(mean(true.value!=predicted.value))
-}
+{% highlight r %}
+# records will be a matrix containing the test & training errors for each model
 records = matrix(NA, nrow=3, ncol=2)
 colnames(records) = c("train.error","test.error")
 rownames(records) = c("tree","logistic","lasso")
-colnames(all.tr)
 {% endhighlight %}
 
 
 {% highlight r %}
+# simplify col names
 colnames(all.tr)[22:25] <- c("LessThanHighSchool", "HighSchool", "Associate", "BachelorHigher")
 colnames(all.te)[22:25] <- c("LessThanHighSchool", "HighSchool", "Associate", "BachelorHigher")
 {% endhighlight %}
@@ -345,49 +365,78 @@ colnames(all.te)[22:25] <- c("LessThanHighSchool", "HighSchool", "Associate", "B
 # Classification
 ### Tree
 {% highlight r %}
+# before pruning 
+## fit a tree model without any pruning
+### model with selected variables
 tree.unpruned = tree(Poverty ~ State + County + TotalPop + Men + Minority + Employed + LessThanHighSchool + HighSchool + Associate + BachelorHigher, data = all.tr)
 
 
-# tree.unpruned1 = tree(as.factor(Poverty) ~., data = all.tr)
+### an alternative model with all variables
+tree.unpruned1 = tree(as.factor(Poverty) ~., data = all.tr)
 
 
-# unpruned predictions
-unpruned.tr.pred = predict(tree.unpruned, all.tr, type="class")
-unpruned.te.pred = predict(tree.unpruned, all.te, type="class")
+## unpruned predictions for the training and the test dataset
+unpruned.tr.pred = predict(tree.unpruned1, all.tr, type="class")
+unpruned.te.pred = predict(tree.unpruned1, all.te, type="class")
 
-# unpruned error rates
-## training data
-# unpruned.tr.err = table(unpruned.tr.pred, all.tr$Poverty)
-# 1-sum(diag(unpruned.tr.err))/sum(unpruned.tr.err)
-## test data
-# unpruned.te.err = table(unpruned.te.pred, all.te$Poverty)
-# 1-sum(diag(unpruned.te.err))/sum(unpruned.te.err)
 
-# plot the unpruned tree
+## unpruned error rates
+### training data
+unpruned.tr.err = table(unpruned.tr.pred, all.tr$Poverty)
+1-sum(diag(unpruned.tr.err))/sum(unpruned.tr.err)
+### test data
+unpruned.te.err = table(unpruned.te.pred, all.te$Poverty)
+1-sum(diag(unpruned.te.err))/sum(unpruned.te.err)
+
+
+## plot the unpruned tree
+draw.tree(tree.unpruned1, nodeinfo=TRUE, cex = 0.4)
 draw.tree(tree.unpruned, nodeinfo=TRUE, cex = 0.4)
 title("Poverty Unpruned Tree")
 
-# pruning
-cv = cv.tree(tree.unpruned, folds, FUN=prune.misclass, K = nfolds)
-best.cv = min(cv$size[cv$dev == min(cv$dev)])
-tree.pruned = prune.misclass(tree.unpruned, best=best.cv)
 
-# plot the pruned tree
+# ---------------------------------------------------------- #
+
+# pruning
+## performs k-fold CV to determine the optimal level of tree complexity
+cv = cv.tree(tree.unpruned1, folds, FUN=prune.misclass, K = nfolds)
+
+## get the minimum size that has the smallest CV error rate (dev)
+best.cv = min(cv$size[cv$dev == min(cv$dev)])
+
+## get a new tree with the pre-specified number (best.cv) of nodes 
+tree.pruned = prune.misclass(tree.unpruned1, best=best.cv)
+
+
+## plot the pruned tree
 plot(tree.pruned)
 text(tree.pruned, pretty=0, col = "blue", cex = .5)
 title("Poverty pruned tree of size 3")
 
-# pruned predictions
+
+## pruned predictions
 pruned.tr.pred = predict(tree.pruned, newdata = all.tr, type="class")
 pruned.te.pred = predict(tree.pruned, newdata = all.te, type="class")
 
 # pruned error rates
 ## training data
 pruned.tr.err = table(pruned.tr.pred, all.tr$Poverty)
-records[1,1] = 1-sum(diag(pruned.tr.err))/sum(pruned.tr.err)
+
 ## test data
 pruned.te.err = table(pruned.te.pred, all.te$Poverty)
+
+
+## store these rates in records
+records <- data.frame(row.names = "tree")
+
+### error rate for training data
+records[1,1] = 1-sum(diag(pruned.tr.err))/sum(pruned.tr.err)
+
+### for test data
 records[1,2] = 1-sum(diag(pruned.te.err))/sum(pruned.te.err)
+
+colnames(records) <- c("training", "test")
+
 records
 {% endhighlight %}
    
@@ -397,14 +446,22 @@ records
 
 {% highlight r %}
 # model
+# glm model using the training data
 glm.fit = glm(Poverty~., data = all.tr, family=binomial)
 summary(glm.fit)
 
+# training error rate
 prob.tr = predict(glm.fit, type="response")
 logistic.pred.tr=as.factor(ifelse(prob.tr >0.5, 1, 0))
-glm.tr.table = table(pred=logistic.pred.tr, true=all.tr$Poverty) # training error table
+glm.tr.table = table(pred=logistic.pred.tr, true=all.tr$Poverty)
 
 
+# test error rate
+
+## add unique counties in the test set to the model
+glm.fit$xlevels$County <- union(glm.fit$xlevels$County, unique(all.te$County))
+
+## 
 prob.te = predict(glm.fit, type="response", newdata = all.te)
 logistic.pred.te=as.factor(ifelse(prob.te >0.5, 1, 0))
 glm.te.table = table(pred=logistic.pred.te, true=all.te$Poverty) # test error table
