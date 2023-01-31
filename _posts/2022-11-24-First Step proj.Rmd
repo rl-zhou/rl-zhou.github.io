@@ -1,7 +1,6 @@
 ---
 title:  "Potential causes for low birthweight"
 mathjax: true
-layout: rmd
 output: html_document
 categories: project
 ---
