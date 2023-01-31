@@ -36,8 +36,8 @@ birth$firstep <- factor(birth$firstep)
 
 {% endhighlight %}
 
-## results 
-### univariate summary statistics
+# results 
+univariate summary statistics
 {% highlight r %}
 
 descrip(birth, strata = birth$firstep)
@@ -75,16 +75,16 @@ mean(birth[birth$firstep==1,]$bwt) # FS
 mean(birth[birth$firstep==0,]$bwt) # non-FS
 {% endhighlight %}
 
-#### outliers 
+_outliers_ 
 The distribution patterns were similar for people who enrolled or not enrolled in the FS program, so for this section we'll look at the total population only.   
 By examining table 1 and histograms, smokeN (the number of cigarettes per day during pregnancy) and drinkN (number of drinks per day during pregnancy) had outliers. For smokeN, the mode was at 0 with a 2.633 standard deviation, while outliers were larger than 15. Similar pattern was observed on drinkN, where the mode was at 0, and sd was 0.4756, but 3 out of 2500 mothers drank 10 or more per day. 
 
-#### skewness
+_skewness_
 Birthweights(bwt) showed a slight left skewness. This might be caused by a large number of preterm births. Pre mature babies had smaller weights and the smallest possible weight could be as low as 0g, so the data included many small bwt values. On the other hand, post mature and normal babies may not show obvious overweight, and the heavier half didn't range as broad as the lighter half.   
 Other than bwt, gestation (gestational age at birth), wgain (weightgain), parity (prior number of children in family), wpre (mother's prepregnancy weight) and education (years of mother's education) were also highly skewed.  
 
 
-### part 3 Preliminary analysis
+# Preliminary analysis
 {% highlight r %}
 t.test(birth[birth$firstep==0,]$bwt, birth[birth$firstep==1,]$bwt)
 {% endhighlight %}
@@ -96,7 +96,7 @@ the 95% confidence interval for the FS babies is $3359 \pm 1.96 \times \frac{610
 Similarly, the 95% CI for non-FS babies is $(3401.528, 3448.472)$.  
 By comparison, we can see that because the non-FS babies had a larger sample size, the confidence interval was narrower than that for FS babies. 
 
-### part 4 What variables may cause such a difference in birthweights? 
+# What variables may cause such a difference in birthweights? 
 {% highlight r %}
 # t test for weight gain
 t.test(birth$wgain[birth$firstep==1], birth$wgain[birth$firstep==0])
@@ -110,7 +110,7 @@ FS mothers tend to be (4.67 yrs) younger and (2.37 yrs) less educated than non-F
 White mothers (48.7% for FS vs. 71.6% for non-FS) composed the largest proportion for both the FS and non-FS group. A few differences are: the non-FS group had fewest black (5.7%) and Hispanic (6.4%) mothers, and Asian (16.3%) mothers were slightly outnumbered, but were still far fewer than White mothers. The FS group, on the other hand, had a slightly more averaged race distribution. It had 13.5% Asian mothers, 15.3% Black mothers, and 22.4% Hispanic mothers.  (__figure__)  
 In terms of amount of maternal weight-gain during pregnancy, no obvious difference was observed between the FS and the non-FS group. The average weight gain for the FS group was 32.988 pounds and 32.143 for the non-FS group. A t-test with p-value = 0.3081 showed that there was no difference among the two. 
 
-### part 5 Potential Risk Factors
+# Potential Risk Factors
 married, welfare, and smoker are possible dichotomous variables that affect birth weights of the new borns. 
 {% highlight r %}
 # descriptive stats for the three variables
@@ -182,7 +182,7 @@ ggplot(birth, aes(x=race, y=bwt)) +
 From the figure above, we may conclude that the birthweights of babies whose mothers enrolled in FS were more centralized around the mean weight. The heaviest FS baby was lighter than the heaviest non-FS baby, and the lightest FS baby was heavier than the non-FS baby in group Asian, Black, and White. For group Hispanic, FS group had a few outliers with extremely low weight babies, but if we exclude those points, the trend in other groups applies to Hispanic group as well, that is, baby weights in FS group had a smaller max weight and larger min weight compared to non-FS group. Strictly speaking, non of the race groups had significant benefit by participating FS, only Hispanic group showed smaller proportion of low weight babies while kept the proportion of normal weight babies when their mothers participated FS. 
 
 
-### part 6 Low Birthweight and Very Low Birthweight
+# Low Birthweight and Very Low Birthweight
 {% highlight r %}
 # low BW
 low_FS <- nrow(birth[c(birth$firstep==1 & birth$bwt<2500),])/nrow(birth[birth$firstep==1,])
@@ -220,7 +220,7 @@ vlow_nwelfare <- nrow(birth[c(birth$welfare==0 & birth$bwt<1500),])/nrow(birth[b
 
 FS group had 6.203% of low BW and 1.489% very low BW babies, while non-FS group only had 4.864% of low BW and 0.525% very low BW babies. FS group had both a higher proportion of low BW babies and very low BW babies, meaning that enrolling in FS didn't help mothers to have stronger babies on average. However, we couldn't conclude that the FS program didn't help to improve babies' weights because we need to consider the group difference between mothers who enrolled in FS and who didn't. It might be that FS mothers would give birth to even weaker babies if they weren't in FS. 
 
-## discussion 
+# discussion 
 Overall, FS babies did not outperform than non-FS group. 
 
 {% highlight r %}
