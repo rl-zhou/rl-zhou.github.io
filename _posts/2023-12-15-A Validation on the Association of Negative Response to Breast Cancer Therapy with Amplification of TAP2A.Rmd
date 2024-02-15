@@ -1,14 +1,17 @@
 ---
 title: "A Validation on the Association of Negative Response to Breast Cancer Therapy with Amplification of TAP2A"
-author: "Weiqiao Shen & Raylynn Zhou"
-output: pdf_document
+mathjax: true
+layout: post
+output: html_document
 ---
+* collaborated with: Weiqiao Shen
 
-```{r setup, include=FALSE}
+{% highlight r %}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
-```
+{% endhighlight %}
 
-```{r}
+
+{% highlight r %}
 library(mice)
 library(missRanger)
 library(naniar)
@@ -25,9 +28,9 @@ dat <- demo %>%
   mutate(TOP2Atri = as.factor(TOP2Atri)) %>%
   drop_na(TOP2Atri)
 
-```
+{% endhighlight %}
 
-```{r functions}
+{% highlight r %}
 # random forest imputation
 one.rfi <- function(data){
   rf.data <- missRanger(data %>% select(-TOP2Atri, -DMFS_time, -OS_time), pmm.k=3, num.trees=100, verbose=F) %>%
@@ -121,18 +124,19 @@ get.CI <- function(sampling_dist, CI_range = c(0.025,0.975), actual_OR){
   return(log(CI))
 }
 
-```
+{% endhighlight %}
 
-```{r descriptive analysis}
+{% highlight r %}
 da_dat <- demo %>% 
   select(-samplename, -filename, -geo_accn, -FINAL_ANALYSIS) %>% 
   mutate(across(c(agebin, `T`, N, grade, HER2FISHbin, TOP2Atri, ESR1bimod,
                   ERBB2bimod, pCR, DMFS_event, OS_event), as.factor))
 CreateTableOne(data=da_dat, strata="TOP2Atri", includeNA=T, test=F)
-```
+{% endhighlight %}
 
 
-```{r imputation}
+
+{% highlight r %}
 # Should exposure be used to impute outcome? If yes, do we need to apply cross validation in imputation?
 # How to impute exposure variable? or simply removing missing values in exposure?
 
@@ -163,9 +167,10 @@ dat.tbl2.1 <- data.frame(pCR=c(rep(0, 96), rep(1, 10)),
                                    rep(1, 6),
                                    rep(0, 10-6)))
 
-```
+{% endhighlight %}
 
-```{r model fitting}
+
+{% highlight r %}
 
 # ORs based on MI data
 (actual.OR.mi <- one.glm(dat.mi, vars = c("agebin", "HER2FISH", "TOP2Atri")))
@@ -181,11 +186,12 @@ dat.tbl2.1 <- data.frame(pCR=c(rep(0, 96), rep(1, 10)),
 # ORs based on dat.tbl2.2
 #(actual.OR.tbl2 <- one.glm(dat.tbl2.2))
 
-```
+{% endhighlight %}
 
 
 
-```{r permutation, warning=FALSE}
+
+{% highlight r %}
 
 # run simulations
 nsim <- 20000
@@ -270,11 +276,12 @@ ggplot() +
                                        c(0.025, 0.975))),
                  color = 'miCI')) 
 
-```
+{% endhighlight %}
 
 
 
-```{r bootstrap with imputation}
+
+{% highlight r %}
 
 set.seed(1)
 nsim <- 1000
@@ -347,47 +354,13 @@ ggplot() +
        title = "Bootstrapping Crude log OR with Imputations, Amplification") +
   scale_color_manual(name='Legend',
                      values=c('mi'='darkgreen', 'rfi'='darkblue', 'miCI' = 'orange', 'rfiCI' = 'darkred'))
-```
+{% endhighlight %}
 
 
 
-```{r bootstrap without imputation}
-# 
-# set.seed(1)
-# nsim <- 1000
-# 
-# # adjusted
-# boot_OR_mi_noimp <- suppressWarnings(replicate(nsim, tmp.one.boot(dat.mi, variables = c("agebin", "HER2FISH", "TOP2Atri"))))
-# boot_OR_rfi_noimp <- suppressWarnings(replicate(nsim, tmp.one.boot(dat.rfi, variables = c("agebin", "HER2FISH", "TOP2Atri"))))
-# all_boot_OR_noimp  <- as.data.frame(cbind(t(boot_OR_mi_noimp), t(boot_OR_mi_noimp)))
-# names(all_boot_OR_noimp) <- names(all_perm_OR)
-# 
-# # crude
-# boot_OR_mi_simple_noimp <- suppressWarnings(replicate(nsim, tmp.one.boot(dat.mi)))
-# boot_OR_rfi_simple_noimp <- suppressWarnings(replicate(nsim, tmp.one.boot(dat.rfi)))
-# all_boot_OR_simple_noimp <- as.data.frame(cbind(t(boot_OR_mi_simple_noimp), t(boot_OR_rfi_simple_noimp)))
-# names(all_boot_OR_simple_noimp) <- names(all_perm_OR_simple)
-# 
-# 
-# # visualizations
-# # adj, amp
-# ggplot() + 
-#   geom_density(data = all_boot_OR_noimp, aes(x = log(TOP2Atri1_mi), y = ..density.., color = "mi")) + 
-#   geom_density(data = all_boot_OR_noimp, aes(x = log(TOP2Atri1_rfi), y = ..density.., color = "rfi")) + 
-#   geom_vline(aes(xintercept = (get.CI(all_boot_OR_noimp$TOP2Atri1_mi, 
-#                                       actual_OR = actual.OR.mi[5])), 
-#                  color = 'miCI')) +
-#   geom_vline(aes(xintercept = (get.CI(all_boot_OR_noimp$TOP2Atri1_rfi, 
-#                                       actual_OR = actual.OR.rfi[5])), color = 'rfiCI')) +
-#   labs(x = "Crude log OR between amplification and normal TOP2A",
-#        title = "Bootstrapping Crude log OR with Imputations, Amplification") +
-#   scale_color_manual(name='Legend',
-#                      values=c('mi'='darkgreen', 'rfi'='darkblue', 'miCI' = 'orange', 'rfiCI' = 'darkred'))
-
-```
 
 
-```{r result table}
+{% highlight r %}
 # all values extracted from the mi dataset for simplicity
 
 # p values
@@ -438,12 +411,6 @@ names(result_table) <- c("log OR", "p values", "CI")
 
 
 knitr::kable(result_table)
-```
+{% endhighlight %}
 
 
-\pagebreak
-
-## Code Appendix
-
-```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
-```
