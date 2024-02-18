@@ -31,8 +31,8 @@ dat <- demo %>%
 
 {% endhighlight %}
 
+### random forest imputation
 {% highlight r %}
-# random forest imputation
 one.rfi <- function(data){
   rf.data <- missRanger(data %>% select(-TOP2Atri, -DMFS_time, -OS_time), pmm.k=3, num.trees=100, verbose=F) %>%
     mutate(TOP2Atri=data$TOP2Atri)
