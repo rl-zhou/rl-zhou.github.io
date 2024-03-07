@@ -179,13 +179,13 @@ find.CI <- function(data, interval = c(0.025, 0.975)){
 # Results
 The original paper concluded that TOP2A amplification was significantly associated with pCR. In this project, we reached same conclusions for both the simple,    
 
-$\hat{pCR_i} = \hat{\beta_0} + \hat{\beta_1}\text{TOP2A}_i$
+$`\hat{pCR_i} = \hat{\beta_0} + \hat{\beta_1}\text{TOP2A}_i`$
 
 and the multiple logistic regression model,    
 
-$\hat{pCR_i} = \hat{\beta_0} + \hat{\beta_1}\text{TOP2A}_i + \hat{\beta_2}\text{age}_i + \hat{\beta_3}\text{HER2}_i$,   
+$`\hat{pCR_i} = \hat{\beta_0} + \hat{\beta_1}\text{TOP2A}_i + \hat{\beta_2}\text{age}_i + \hat{\beta_3}\text{HER2}_i`$,   
 
-where in both models, i represents the $i^{th}$ patient in the dataset. The total number of patients being included in this project was 87, who were also included in the data analysis in the original paper and had a valid TOP2A expression level recorded.   
+where in both models, i represents the $`i^{th}`$ patient in the dataset. The total number of patients being included in this project was 87, who were also included in the data analysis in the original paper and had a valid TOP2A expression level recorded.   
 
 The multiple logistic regression model estimated the log OR of pCR between patients with amplified TOP2A and normal TOP2A being 2.581 (-inf, 1.993). Given that the p-value (0.009) was significant under the 0.05 significance level, we rejected the null hypothesis that the probability of pCR does not associate with TOP2A amplification. Similar conclusion applied to the simple logistic regression, where the log OR was estimated to be 2.725 (-inf, 1.459), with a significant p-value of 0.00015. Table 2 summarized estimates for all four models. 
 
