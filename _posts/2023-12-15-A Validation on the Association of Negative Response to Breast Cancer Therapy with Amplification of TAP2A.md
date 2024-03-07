@@ -157,7 +157,7 @@ perm.OR <- function(data, variables = "TOP2Atri", sim_num = nsim) {
 plot_density <- function(data, var_mi, var_rfi, actual_val,
                          title, ci = c(0.025, 0.975)) {
   ggplot(data) +
-    geom_density(aes(x = log(/{{var_mi/}}), y = ..density.., color = "mi")) +
+    geom_density(aes(x = log(\{\{var_mi\}\}), y = ..density.., color = "mi")) +
     geom_density(aes(x = log({{var_rfi}}), y = ..density.., color = "rfi")) +
     labs(title = title,
          x = "log OR") +
