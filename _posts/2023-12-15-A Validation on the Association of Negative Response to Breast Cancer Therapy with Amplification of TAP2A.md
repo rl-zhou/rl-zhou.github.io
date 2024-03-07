@@ -2,13 +2,13 @@
 title: "A Validation on the Association of Negative Response to Breast Cancer Therapy with Amplification of TAP2A"
 mathjax: true
 layout: post
-output: html_document
+output: rmarkdown::github_document
 categories: project
 ---
 * collaborated with: Weiqiao Shen. Weiqiao contributed to the first half, and my (Ruilin's) work begins from the model fitting section)     
 
 # Introduction
-A surrogate endpoint is a clinical trial endpoint used as a substitute for a direct measure of how a patient feels, functions, or survives when the clinical outcomes might take too much time to study or in cases where the clinical benefit of improving the surrogate endpoint is well understood.[2] Validated surrogate endpoints likely provide patients with serious diseases more rapid access to promising therapies. In this project, rather than finding a new one, we decided to validate a previously proved surrogate for breast cancer. 
+A surrogate endpoint is a clinical trial endpoint used as a substitute for a direct measure of how a patient feels, functions, or survives when the clinical outcomes might take too much time to study or in cases where the clinical benefit of improving the surrogate endpoint is well understood[2]. Validated surrogate endpoints likely provide patients with serious diseases more rapid access to promising therapies. In this project, rather than finding a new one, we decided to validate a previously proved surrogate for breast cancer. 
 
 In 2011, a paper by Desmedt, Christine et al. was published, validating biomarkers predictive of response/resistance to anthracyclines in breast cancer. In that paper, the authors claimed that TOP2A (topoisomerase IIα) amplification was significantly associated with pathological complete response (P ≤ 0.001)[1]. With curiosity, we decided to re-validate this observation on the dataset which the authors published on NCBI (National Center for Biotechnology Information) to answer the question whether TOP2A is truly a predictive biomarker of for breast cancer therapy response.
 
@@ -293,4 +293,10 @@ To conclude, we reached the same results as the original paper had, even though 
 
 In the logistic regression model, we used TOP2A to predict the pathological complete response, adjusted for age and HER2. However, in the original paper, the authors only provided the unadjusted OR. Including additional covariates may also lead to differences in the estimated OR. Additionally, since we used imputation to fill in missing values, we might introduce unwanted association between clinical parameters and outcome of interest. Except for those two concerns, we also need more consideration on the covariates to involve in logistic regression in terms of precision.
 
+### References
+1. Desmedt, Christine et al (2011). Multifactorial approach to predicting resistance to 
+anthracyclines. Journal of clinical oncology : official journal of the American Society of Clinical Oncology vol. 29,12: 1578-86. doi:10.1200/JCO.2010.31.2231
+2. Food and Drug Administration (2017). Surrogate Endpoint Resources for Drug and
+Biologic Development. https://www.fda.gov/drugs/development-resources/surrogate-endpoint-resources-drug-and-biologic-development
+![image](https://github.com/rl-zhou/rl-zhou.github.io/assets/122069379/bbd9fd46-6b85-410c-b494-9f3c105ea531)
 
