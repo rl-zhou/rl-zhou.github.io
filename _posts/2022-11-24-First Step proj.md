@@ -15,18 +15,18 @@ library(knitr)
 library(vtable)
 {% endhighlight %}
 
-# setup
+### setup
 
 {% highlight r %}
-# read in table
+#read in table
 birth_copy <- read.table("BirthsKingCounty2001-Biost514-517-2022.txt", header=T)
 
-# check size 
+#check size 
 dim(birth_copy) # dimension: 25 x 17
 
-# converting Y/N character variables to binary variables: sex, smoker, drinker
-# if smoker/drinker: 1
-# if female: 1
+#converting Y/N character variables to binary variables: sex, smoker, drinker
+#if smoker/drinker: 1
+#if female: 1
 f_converter <- function(x) if_else(x == "N", 0, 1)
 birth <- birth_copy %>% 
   mutate_at(c('smoker', 'drinker'), f_converter) %>% 
@@ -43,9 +43,9 @@ univariate summary statistics
 {% highlight r %}
 
 descrip(birth, strata = birth$firstep)
-# potential confounder: age, married, race (mild),  ?smokeN, ?smoker, education
+#potential confounder: age, married, race (mild),  ?smokeN, ?smoker, education
 
-# histograms
+#histograms
 hist.data.frame(birth[,1:5])
 hist.data.frame(birth[,6:10])
 hist.data.frame(birth[,11:17])
@@ -58,7 +58,7 @@ hist.data.frame(birth[birth$firstep==1,1:5])
 hist.data.frame(birth[birth$firstep==1,6:10])
 hist.data.frame(birth[birth$firstep==1,11:17])
 
-# table 1
+#table 1
 #side by side
 st(birth, add.median = T, title = "Table 1. Descriptive Statistics of Participants Not Enrolled vs. Enroleed in the FS Program", group = "firstep")
 
@@ -66,13 +66,13 @@ st(birth[birth$firstep==0,], add.median = T, title = "Table 1. Descriptive Stati
 
 st(birth[birth$firstep==1,], add.median = T, title = "Table 1. Descriptive Statistics of Participants Enrolled in the FS Program")
 
-# histogram for btw
+#histogram for btw
 ggplot(birth, aes(x=bwt)) +
   geom_histogram() + 
   ggtitle("Histogram for Birthweight Stratifying on firstep") +
   xlab("Birthweight") + ylab("Count")
 
-# mean difference
+#mean difference
 mean(birth[birth$firstep==1,]$bwt) # FS
 mean(birth[birth$firstep==0,]$bwt) # non-FS
 {% endhighlight %}
@@ -104,7 +104,7 @@ By comparison, we can see that because the non-FS babies had a larger sample siz
 # What variables may cause such a difference in birthweights? 
 
 {% highlight r %}
-# t test for weight gain
+#t test for weight gain
 t.test(birth$wgain[birth$firstep==1], birth$wgain[birth$firstep==0])
 {% endhighlight %}
 
@@ -116,29 +116,29 @@ FS mothers tend to be (4.67 yrs) younger and (2.37 yrs) less educated than non-F
 White mothers (48.7% for FS vs. 71.6% for non-FS) composed the largest proportion for both the FS and non-FS group. A few differences are: the non-FS group had fewest black (5.7%) and Hispanic (6.4%) mothers, and Asian (16.3%) mothers were slightly outnumbered, but were still far fewer than White mothers. The FS group, on the other hand, had a slightly more averaged race distribution. It had 13.5% Asian mothers, 15.3% Black mothers, and 22.4% Hispanic mothers.  (__figure__)  
 In terms of amount of maternal weight-gain during pregnancy, no obvious difference was observed between the FS and the non-FS group. The average weight gain for the FS group was 32.988 pounds and 32.143 for the non-FS group. A t-test with p-value = 0.3081 showed that there was no difference among the two. 
 
-# Potential Risk Factors
+### Potential Risk Factors
 
 married, welfare, and smoker are possible dichotomous variables that affect birth weights of the new borns. 
 {% highlight r %}
-# descriptive stats for the three variables
+#descriptive stats for the three variables
 descrip(birth[c('firstep', 'bwt')], strata = birth$firstep)
 
-## table 2 includes: 1 for FS group, another for non-FS, descriptive data (p-values for t-test, CI, descriptive stats) 
+##table 2 includes: 1 for FS group, another for non-FS, descriptive data (p-values for t-test, CI, descriptive stats) 
 
-# difference in bwt by firstep
+#difference in bwt by firstep
 t.test(birth$bwt[birth$firstep==1], birth$bwt[birth$firstep==0])
 
-# t-tests for the three variables
-## married
+#t-tests for the three variables
+##married
 t.test(birth$bwt[birth$married==1], birth$bwt[birth$married==0])
 
-## welfare
+##welfare
 t.test(birth$bwt[birth$welfare==1], birth$bwt[birth$welfare==0])
 
-# smoker
+#smoker
 t.test(birth$bwt[birth$smoker==1], birth$bwt[birth$smoker==0])
 
-# figure
+#figure
 ggplot(birth, aes(x=married, y=bwt)) +
   geom_boxplot(aes(group=married)) +
   ggtitle("a. Effect of Marital Status on Birthweight") +
@@ -158,12 +158,12 @@ ggplot(birth, aes(x=firstep, y=bwt)) +
 {% endhighlight %}
 
 {% highlight r %}
-# treatment effect
-# diff. between smokers who enrolled in FS vs. not enrolled in FS
+#treatment effect
+#diff. between smokers who enrolled in FS vs. not enrolled in FS
 diff.smoker = mean(birth$bwt[birth$firstep==1 & birth$smoker==1]) - mean(birth$bwt[birth$firstep==0 & birth$smoker==1])
 t.test(birth$bwt[birth$firstep==1 & birth$smoker==1], birth$bwt[birth$firstep==0 & birth$smoker==1])
 
-# diff. between non-smokers who enrolled in FS vs. not enrolled in FS
+#diff. between non-smokers who enrolled in FS vs. not enrolled in FS
 diff.nonsmoker = mean(birth$bwt[birth$firstep==1 & birth$smoker==0]) - mean(birth$bwt[birth$firstep==0 & birth$smoker==0])
 t.test(birth$bwt[birth$firstep==1 & birth$smoker==0], birth$bwt[birth$firstep==0 & birth$smoker==0])
 {% endhighlight %}
@@ -172,7 +172,7 @@ Among the three risk factors, smoking during pregnancy might be the easiest fact
 Smokers who enrolled in FS had babies that were, on average, 67.537g lighter than babies whose mothers didn't enrolled in FS. Non smokers who enrolled in FS had babies that were, on average, 47.99622g lighter than babies whose mothers didn't enrolled in FS. Although non smokers seem to make the FS and non-FS group to have babies with similar weights, both t-tests had p-values larger than 0.05, meaning that the true difference between the two groups are not significantly different.  
 
 {% highlight r %}
-# figure stratifying on race
+#figure stratifying on race
 ggplot(birth[!is.na(birth$race),], aes(x=firstep, y=bwt), na.omit(race)) + 
   geom_boxplot() +
   facet_wrap(~race) +
@@ -192,35 +192,35 @@ From the figure above, we may conclude that the birthweights of babies whose mot
 # Low Birthweight and Very Low Birthweight
 
 {% highlight r %}
-# low BW
+#low BW
 low_FS <- nrow(birth[c(birth$firstep==1 & birth$bwt<2500),])/nrow(birth[birth$firstep==1,])
 low_nFS <- nrow(birth[c(birth$firstep==0 & birth$bwt<2500),])/nrow(birth[birth$firstep==0,])
 
-# very low BW
+#very low BW
 vlow_FS <- nrow(birth[c(birth$firstep==1 & birth$bwt<1500),])/nrow(birth[birth$firstep==1,])
 vlow_nFS <- nrow(birth[c(birth$firstep==0 & birth$bwt<1500),])/nrow(birth[birth$firstep==0,])
 
-# low BW for var. smoker
+#low BW for var. smoker
 low_smoker <- nrow(birth[c(birth$smoker==1 & birth$bwt<2500),])/nrow(birth[birth$smoker==1,])
 low_nsmoker <- nrow(birth[c(birth$smoker==0 & birth$bwt<2500),])/nrow(birth[birth$smoker==0,])
 
-# very low BW for smoker
+#very low BW for smoker
 vlow_smoker <- nrow(birth[c(birth$smoker==1 & birth$bwt<1500),])/nrow(birth[birth$smoker==1,])
 vlow_nsmoker <- nrow(birth[c(birth$smoker==0 & birth$bwt<1500),])/nrow(birth[birth$smoker==0,])
 
-# low BW for var. married
+#low BW for var. married
 low_married <- nrow(birth[c(birth$married==1 & birth$bwt<2500),])/nrow(birth[birth$married==1,])
 low_nmarried <- nrow(birth[c(birth$married==0 & birth$bwt<2500),])/nrow(birth[birth$married==0,])
 
-# very low BW for var. married
+#very low BW for var. married
 vlow_married <- nrow(birth[c(birth$married==1 & birth$bwt<1500),])/nrow(birth[birth$married==1,])
 vlow_nmarried <- nrow(birth[c(birth$married==0 & birth$bwt<1500),])/nrow(birth[birth$married==0,])
 
-# low BW for var. welfare
+#low BW for var. welfare
 low_welfare <- nrow(birth[c(birth$welfare==1 & birth$bwt<2500),])/nrow(birth[birth$welfare==1,])
 low_nwelfare <- nrow(birth[c(birth$welfare==0 & birth$bwt<2500),])/nrow(birth[birth$welfare==0,])
 
-# very low BW for var. welfare
+#very low BW for var. welfare
 vlow_welfare <- nrow(birth[c(birth$welfare==1 & birth$bwt<1500),])/nrow(birth[birth$welfare==1,])
 vlow_nwelfare <- nrow(birth[c(birth$welfare==0 & birth$bwt<1500),])/nrow(birth[birth$welfare==0,])
 
