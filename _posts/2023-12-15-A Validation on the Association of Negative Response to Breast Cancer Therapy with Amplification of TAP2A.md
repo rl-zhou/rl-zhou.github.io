@@ -5,7 +5,7 @@ layout: post
 output: html_document
 categories: project
 ---
-* collaborated with: Weiqiao Shen
+* collaborated with: Weiqiao Shen. Weiqiao contributed to the first half, and my (Ruilin's) work begins from the model fitting section)     
 
 # Introduction
 A surrogate endpoint is a clinical trial endpoint used as a substitute for a direct measure of how a patient feels, functions, or survives when the clinical outcomes might take too much time to study or in cases where the clinical benefit of improving the surrogate endpoint is well understood.[2] Validated surrogate endpoints likely provide patients with serious diseases more rapid access to promising therapies. In this project, rather than finding a new one, we decided to validate a previously proved surrogate for breast cancer. 
@@ -109,7 +109,8 @@ dat.rfi <- within(dat.rfi, TOP2Atri <- relevel(TOP2Atri, ref = '0'))
 
 {% endhighlight %}
 
-- Ruilin's contribution begins from here(except for the first chunk under model fitting section `Model Fitting in R`)
+*Ruilin's contribution begins from here(except for the first chunk under model fitting section `Model Fitting in R`)*
+
 ### Model Fitting
 
 Two models were fitted to both imputed datasets generated from multiple imputation and random forest imputation, respectively. Same as the paper, the first model we employed was a simple logistic regression model, which treated pCR as the response variable and TOP2A status as the only covariate. The other model was multiple logistic regression incorporating age (binary) and HER2 (human epidermal growth factor receptor 2) expression level (numeric) in addition to TOP2A. Age was the only available demographic variable, and we thought including age as a covariate could be more helpful compared to only including variables related to the tumor or gene/protein expression levels. HER2 was also included because of its association with breast cancer treatment [1]. Given that TOP2A was coded as a three level factor, odds ratios (OR) for having pCR comparing either 1) TOP2A amplification and normal TOP2A, or 2) TOP2A deletion and normal TOP2A were estimated. Two imputation algorithms were compared through examining log OR estimates generated from these datasets and permutated null distributions.
