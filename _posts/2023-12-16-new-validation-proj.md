@@ -83,7 +83,7 @@ CreateTableOne(data=da_dat, strata="TOP2Atri", includeNA=T, test=F)
 
 
 # Methods
-## Missing Values
+### Missing Values
 We excluded patients with missing values in exposure in data manipulation to avoid imputing biased exposure variables, and applied multiple imputation and random forest imputation separately to fill in missing values. In order to avoid generating direct association between the pCR (response) and TOP2A status (exposure), we removed the exposure from the dataset when imputing missing values. The data imputation involved 13 variables, including age, tumor grade, axillary lymph node status, HER2 status, TOP2A amplification/deletion status, ER status, and indicator of distant metastasis free survival event and overall survival.
 
 #### Missing Value Imputation in R
@@ -109,8 +109,8 @@ dat.rfi <- within(dat.rfi, TOP2Atri <- relevel(TOP2Atri, ref = '0'))
 
 {% endhighlight %}
 
-- Ruilin's contribution begins from here(except for the first chunk under model fitting section)
-## Model Fitting
+- Ruilin's contribution begins from here(except for the first chunk under model fitting section `Model Fitting in R`)
+### Model Fitting
 
 Two models were fitted to both imputed datasets generated from multiple imputation and random forest imputation, respectively. Same as the paper, the first model we employed was a simple logistic regression model, which treated pCR as the response variable and TOP2A status as the only covariate. The other model was multiple logistic regression incorporating age (binary) and HER2 (human epidermal growth factor receptor 2) expression level (numeric) in addition to TOP2A. Age was the only available demographic variable, and we thought including age as a covariate could be more helpful compared to only including variables related to the tumor or gene/protein expression levels. HER2 was also included because of its association with breast cancer treatment [1]. Given that TOP2A was coded as a three level factor, odds ratios (OR) for having pCR comparing either 1) TOP2A amplification and normal TOP2A, or 2) TOP2A deletion and normal TOP2A were estimated. Two imputation algorithms were compared through examining log OR estimates generated from these datasets and permutated null distributions.
 
@@ -127,7 +127,7 @@ Two models were fitted to both imputed datasets generated from multiple imputati
 
 {% endhighlight %}
 
-## Permutation
+### Permutation
 In order to assess the significance of OR point estimates, permutation tests each with 20000 simulations were performed on 8 estimates (ORs comparing TOP2A levels) generated from 4 models (2 fitted on each dataset generated from each imputation algorithm). The null distribution for ORs were simulated by permuting the response variable, pCR, and followed by refitting the same logistic model (either simple or multiple regression) as they have been fitted before the permutations. 95% CIs and p-values were calculated based on the null distribution. 
 
 #### Function Definitions Part 2
