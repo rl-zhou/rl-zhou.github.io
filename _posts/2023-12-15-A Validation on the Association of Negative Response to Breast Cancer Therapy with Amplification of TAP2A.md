@@ -298,5 +298,4 @@ In the logistic regression model, we used TOP2A to predict the pathological comp
 anthracyclines. Journal of clinical oncology : official journal of the American Society of Clinical Oncology vol. 29,12: 1578-86. doi:10.1200/JCO.2010.31.2231
 2. Food and Drug Administration (2017). Surrogate Endpoint Resources for Drug and
 Biologic Development. https://www.fda.gov/drugs/development-resources/surrogate-endpoint-resources-drug-and-biologic-development
-![image](https://github.com/rl-zhou/rl-zhou.github.io/assets/122069379/bbd9fd46-6b85-410c-b494-9f3c105ea531)
 
