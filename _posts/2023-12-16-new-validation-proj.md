@@ -36,7 +36,7 @@ dat <- demo %>%
 
 {% endhighlight %}
 
-### Function Definitions
+### Function Definition1
 {% highlight r %}
 # random forest imputation
 one.rfi <- function(data){
