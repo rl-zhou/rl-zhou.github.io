@@ -293,4 +293,3 @@ To conclude, we reached the same results as the original paper had, even though 
 In the logistic regression model, we used TOP2A to predict the pathological complete response, adjusted for age and HER2. However, in the original paper, the authors only provided the unadjusted OR. Including additional covariates may also lead to differences in the estimated OR. Additionally, since we used imputation to fill in missing values, we might introduce unwanted association between clinical parameters and outcome of interest. Except for those two concerns, we also need more consideration on the covariates to involve in logistic regression in terms of precision.
 
 
-
