@@ -8,9 +8,9 @@ categories: project
 * collaborated with: Weiqiao Shen
 
 ### Introduction
-A surrogate endpoint is a clinical trial endpoint used as a substitute for a direct measure of how a patient feels, functions, or survives when the clinical outcomes might take too much time to study or in cases where the clinical benefit of improving the surrogate endpoint is well understood.[2] Validated surrogate endpoints likely provide patients with serious diseases more rapid access to promising therapies. In this project, rather than finding a new one, we decided to validate a previously proved surrogate for breast cancer.    
+A surrogate endpoint is a clinical trial endpoint used as a substitute for a direct measure of how a patient feels, functions, or survives when the clinical outcomes might take too much time to study or in cases where the clinical benefit of improving the surrogate endpoint is well understood.[2] Validated surrogate endpoints likely provide patients with serious diseases more rapid access to promising therapies. In this project, rather than finding a new one, we decided to validate a previously proved surrogate for breast cancer. 
 
-In 2011, a paper by Desmedt, Christine et al. was published, validating biomarkers predictive of response/resistance to anthracyclines in breast cancer. In that paper, the authors claimed that TOP2A (topoisomerase II$\alpha$) amplification was significantly associated with pathological complete response (P $\le$ 0.001)[1]. With curiosity, we decided to re-validate this observation on the dataset which the authors published on NCBI (National Center for Biotechnology Information) to answer the question whether TOP2A is a predictive biomarker of response/resistance to anthracyclines in breast cancer.  
+In 2011, a paper by Desmedt, Christine et al. was published, validating biomarkers predictive of response/resistance to anthracyclines in breast cancer. In that paper, the authors claimed that TOP2A (topoisomerase IIα) amplification was significantly associated with pathological complete response (P ≤ 0.001)[1]. With curiosity, we decided to re-validate this observation on the dataset which the authors published on NCBI (National Center for Biotechnology Information) to answer the question whether TOP2A is truly a predictive biomarker of for breast cancer therapy response.
 
 {% highlight r %}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
@@ -82,8 +82,7 @@ CreateTableOne(data=da_dat, strata="TOP2Atri", includeNA=T, test=F)
 
 ### Methods
 ## Missing Values
-We excluded patients with missing values in exposure in data manipulation to avoid creating a biased imputed dataset, and applied multiple imputation and random forest imputation separately to fill in missing values. In order to avoid generating direct association between the pCR (response) and TOP2A status (exposure), we removed the exposure from the dataset when imputing missing values. The data imputation involved 13 variables, including age, tumor grade, axillary lymph node status, HER2 status, TOP2A amplification/deletion status, ER status, and indicator of distant metastasis free survival event and overall survival.
-
+We excluded patients with missing values in exposure in data manipulation to avoid imputing biased exposure variables, and applied multiple imputation and random forest imputation separately to fill in missing values. In order to avoid generating direct association between the pCR (response) and TOP2A status (exposure), we removed the exposure from the dataset when imputing missing values. The data imputation involved 13 variables, including age, tumor grade, axillary lymph node status, HER2 status, TOP2A amplification/deletion status, ER status, and indicator of distant metastasis free survival event and overall survival.
 
 {% highlight r %}
 
@@ -110,8 +109,7 @@ dat.rfi <- within(dat.rfi, TOP2Atri <- relevel(TOP2Atri, ref = '0'))
 
 # Raylynn's contribution begins (except for the first chunk under model fitting section)
 ## Model Fitting
-Two models were fitted to both imputed datasets generated from multiple imputation and random forest imputation, respectively. Same as the paper, the first model we employed was a simple logistic regression model, which treated pCR as the response variable and TOP2A status as the only covariate. The other model was multiple logistic regression incorporating age (binary) and HER2 (human epidermal growth factor receptor 2) expression level (numeric) besides TOP2A. Age was the only available demographic variable, and we thought including age as a covariate could be more helpful compared to only including variables related to the tumor or gene/protein expression levels. HER2 was also included because of its association with breast cancer treatment [1]. Given that TOP2A was coded as a three level factor, odds ratios (OR) for having pCR comparing either 1) TOP2A amplification and normal TOP2A, or 2) TOP2A deletion and normal TOP2A were estimated. Two imputation algorithms were compared through examining log OR estimates generated from these datasets and permutated null distributions.   
-
+Two models were fitted to both imputed datasets generated from multiple imputation and random forest imputation, respectively. Same as the paper, the first model we employed was a simple logistic regression model, which treated pCR as the response variable and TOP2A status as the only covariate. The other model was multiple logistic regression incorporating age (binary) and HER2 (human epidermal growth factor receptor 2) expression level (numeric) in addition to TOP2A. Age was the only available demographic variable, and we thought including age as a covariate could be more helpful compared to only including variables related to the tumor or gene/protein expression levels. HER2 was also included because of its association with breast cancer treatment [1]. Given that TOP2A was coded as a three level factor, odds ratios (OR) for having pCR comparing either 1) TOP2A amplification and normal TOP2A, or 2) TOP2A deletion and normal TOP2A were estimated. Two imputation algorithms were compared through examining log OR estimates generated from these datasets and permutated null distributions.
 {% highlight r %}
 
 # ORs based on MI data
@@ -132,7 +130,7 @@ Two models were fitted to both imputed datasets generated from multiple imputati
 
 
 ## Permutation
-In order to assess the significance of OR point estimates, permutation tests each with 20000 simulations were performed on 8 estimates (ORs comparing TOP2A levels) generated from 4 models (2 fitted on each dataset generated from each imputation algorithm). The null distribution for ORs were simulated by permuting the response variable, pCR, for all observations followed by refitting the same logistic model (either simple or multiple regression) as they have been fitted before the permutations. 95% CIs and p-values were calculated based on the null distribution. 
+In order to assess the significance of OR point estimates, permutation tests each with 20000 simulations were performed on 8 estimates (ORs comparing TOP2A levels) generated from 4 models (2 fitted on each dataset generated from each imputation algorithm). The null distribution for ORs were simulated by permuting the response variable, pCR, and followed by refitting the same logistic model (either simple or multiple regression) as they have been fitted before the permutations. 95% CIs and p-values were calculated based on the null distribution. 
 
 ### Results
 The original paper concluded that TOP2A amplification was significantly associated with pCR. In this project, we reached same conclusions for both the simple,    
@@ -145,9 +143,9 @@ $\hat{pCR_i} = \hat{\beta_0} + \hat{\beta_1}\text{TOP2A}_i + \hat{\beta_2}\text{
 
 where in both models, i represents the $i^{th}$ patient in the dataset. The total number of patients being included in this project was 87, who were also included in the data analysis in the original paper and had a valid TOP2A expression level recorded.   
 
-The multiple logistic regression estimated the log OR of pCR between amplified TOP2A and normal TOP2A to be 2.581 (-inf, 1.993). Given that the p-value (0.009) was significant under the 0.05 significance level, we rejected the null hypothesis that the probability of pCR does not associate with TOP2A amplification. Similar conclusion applied to the simple logistic regression, where the log OR was estimated to be 2.725 (-inf, 1.459), with a significant p-value of 0.00015. Table 2 summarized estimates for all four models. 
+The multiple logistic regression model estimated the log OR of pCR between patients with amplified TOP2A and normal TOP2A being 2.581 (-inf, 1.993). Given that the p-value (0.009) was significant under the 0.05 significance level, we rejected the null hypothesis that the probability of pCR does not associate with TOP2A amplification. Similar conclusion applied to the simple logistic regression, where the log OR was estimated to be 2.725 (-inf, 1.459), with a significant p-value of 0.00015. Table 2 summarized estimates for all four models. 
 
-Models for TOP2A deletion also shared the same conclusion as the original paper. The multiple logistic regression estimated a log OR of 0.824 (-inf, 1.864), with a p-value of 0.191, so we could not reject the null hypothesis that pCR does not associate with TOP2A gene deletion. Similarly, the simple logistic regression had an estimated log OR of 0.116 (-inf, 1.459), with an insignificant p-value (0.116) that was not strong enough to reject the null. 
+Models for TOP2A deletion also shared the same conclusion as the original paper: no significance association between TOP2A gene deletion and therapy response. The multiple logistic regression estimated a log OR of 0.824 (-inf, 1.864), with a p-value of 0.191, so we could not reject the null hypothesis that pCR does not associate with TOP2A gene deletion. Similarly, the simple logistic regression had an estimated log OR of 0.116 (-inf, 1.459), with an insignificant p-value (0.116) that was not strong enough to reject the null. 
 
 All 95% CI for log OR under the null distribution shared a common lower bound that approached negative infinity. This was due to the randomness in the permutation process that re-assigned the response variable in a way that the logistic regression model estimated some extreme OR that were infinitely close to 0. The subsequent log transformation expanded the CI to negative infinity. Although the simple and multiple logistic regression models had the same conclusion, estimates from the multiple logistic regression model had wider CI compared to the simpler model. Figure 1 provides visualizations for results in Table 2. 
 
@@ -283,5 +281,11 @@ names(result_table) <- c("log OR", "p values", "CI")
 
 knitr::kable(result_table)
 {% endhighlight %}
+
+### Discussion 
+To conclude, we reached the same results as the original paper had, even though they did not conduct permutation testing. Working beyond their simple logistic regression, we fitted a multiple logistic regression by adjusting age and HER2 expression level. It also gave statistically significant, although slightly more uncertain, conclusions. One possible reason for not getting more precise estimates even though we adjusted for covariates that were known to be correlated with the response could be the variability in imputed values. We did not try complete case analysis to reduce bias. However, imputation itself has a random process, we still introduced additional variation into our datasets. Plus, as the existing values probably were not good representations of the truth, we might exaggerate bias through imputation if complete cases were not representative. Although authors provided descriptive statistics stratifying on response and by all covariates, we unfortunately could not reproduce the whole dataset because the information is limited. So, we could have a conservative conclusion that TOP2A amplification is significantly associated with higher odds of having complete response. To further improve our validation, we need to get the complete dataset and apply the analysis we have done to the complete data. 
+
+In the logistic regression model, we used TOP2A to predict the pathological complete response, adjusted for age and HER2. However, in the original paper, the authors only provided the unadjusted OR. Including additional covariates may also lead to differences in the estimated OR. Additionally, since we used imputation to fill in missing values, we might introduce unwanted association between clinical parameters and outcome of interest. Except for those two concerns, we also need more consideration on the covariates to involve in logistic regression in terms of precision.
+
 
 
